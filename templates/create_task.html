@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block title %}Assign Task{% endblock %}
+{% block content %}
+<h2>Assign Task</h2>
+<form method="POST">
+    {{ form.hidden_tag() }}
+    {{ form.title.label }} {{ form.title(class="form-control") }}
+    {{ form.description.label }} {{ form.description(class="form-control") }}
+    {{ form.assigned_to_email.label }} {{ form.assigned_to_email(class="form-control") }}
+    {{ form.project_id.label }} {{ form.project_id(class="form-control") }}
+    <br>
+    {{ form.submit(class="btn btn-primary") }}
+</form>
+{% endblock %}
