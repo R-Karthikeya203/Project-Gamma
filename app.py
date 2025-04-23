@@ -1,23 +1,25 @@
-from flask import Flask, render_template, redirect, url_for, flash, request, session
+from flask import Flask, render_template, redirect, url_for, flash, request, session, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate 
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_wtf.csrf import CSRFProtect
 from forms import RegisterForm, LoginForm, ProjectForm, TaskForm, CommentForm, FileUploadForm
 from models import db, User, Project, Task, Comment, File
 from config import Config
 import os
-from flask import send_from_directory
 
 app = Flask(__name__)
 app.config.from_object(Config)
+
+
 db.init_app(app)
+migrate = Migrate(app, db)  
 csrf = CSRFProtect(app)
 
-# Create necessary directories if they don't exist
+
 if not os.path.exists(app.config['UPLOAD_FOLDER']):
     os.makedirs(app.config['UPLOAD_FOLDER'])
 
-# Create tables when the app starts
 with app.app_context():
     db.create_all()
 
@@ -65,12 +67,10 @@ def logout():
 def dashboard():
     if 'user_email' not in session:
         return redirect(url_for('login'))
-    
+
     if session['user_role'] == 'admin':
-        # Admin can see all tasks
         tasks = Task.query.all()
     else:
-        # Team member sees only their assigned tasks
         tasks = Task.query.filter_by(assigned_to_email=session['user_email']).all()
 
     return render_template('dashboard.html', tasks=tasks, user=session)
